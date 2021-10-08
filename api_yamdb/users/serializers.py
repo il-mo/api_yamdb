@@ -13,13 +13,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
         Check that the username is not "me".
         """
         if 'me' == value.lower():
-           raise serializers.ValidationError('''Username cann't be "me"''')
+            raise serializers.ValidationError('''Username cann't be "me"''')
         return value
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        fields = '__all__'
+        fields = (
+            'username', 'email', 'first_name',
+            'last_name', 'bio', 'role'
+        )
+        model = User
 
 
 class TokenSerializer(serializers.Serializer):

@@ -1,11 +1,46 @@
 from django.shortcuts import get_object_or_404
 from django.core.mail import send_mail
-from django.contrib.auth.tokens import default_token_generator   
+from django.contrib.auth.tokens import default_token_generator
+from rest_framework.decorators import action, api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
-from rest_framework import status
+from rest_framework import filters, viewsets, status
+from rest_framework_simplejwt.tokens import RefreshToken
+from smtplib import SMTPResponseException
+from .permissions import IsAdminOrSuperUser
 from .models import User
-from .serializers import *
+from .serializers import (
+    RegistrationSerializer,
+    UserSerializer,
+    TokenSerializer)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    permission_classes = (IsAdminOrSuperUser,)
+    serializer_class = UserSerializer
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('username',)
+    lookup_field = 'username'
+
+    @action(
+        detail=False,
+        methods=['GET', 'PATCH'],
+        permission_classes=[IsAuthenticated])
+    def me(self, request):
+        if request.method == 'GET':
+            serializer = self.get_serializer(request.user)
+            return Response(serializer.data)
+
+        serializer = self.get_serializer(
+            request.user,
+            data=request.data,
+            partial=True)
+        serializer.is_valid(raise_exception=True)
+        if serializer.validated_data.get('role'):
+            serializer.validated_data['role'] = request.user.role
+        serializer.save()
+        return Response(serializer.data)
 
 
 @api_view(['POST'])
@@ -20,8 +55,7 @@ def registration_API_view(request):
             data={
                 'error': 'Данный пользователь уже зарегестрирован.',
             },
-            status=status.HTTP_400_BAD_REQUEST
-        )
+            status=status.HTTP_400_BAD_REQUEST)
 
     user = User.objects.create_user(username=username, email=email)
     user.save()
@@ -29,24 +63,21 @@ def registration_API_view(request):
     token = default_token_generator.make_token(user)
     try:
         send_mail(
-            f'Token',
+            'Token',
             f'{token}',
             'Cuencaldd@ya.ru',
             [email],
-            fail_silently=False,
-        )
+            fail_silently=False)
         return Response(
             data=serializer.data,
-            status=status.HTTP_200_OK
-        )
-    except:
+            status=status.HTTP_200_OK)
+    except SMTPResponseException:
         user.delete()
         return Response(
             data={
                 'error': 'Ошибка отправки кода подтверждения!',
             },
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @api_view(['POST'])
@@ -63,11 +94,9 @@ def take_confirmation_code_view(request):
             },
             status=status.HTTP_400_BAD_REQUEST
         )
-    refresh_token = RefreshToken.for_user(user)
+    token = RefreshToken.for_user(user)
     return Response(
         data={
-            'refresh':str(refresh_token),
-            'access': str(refresh_token.access_token)
+            'access': str(token.token)
         },
-        status=status.HTTP_200_OK
-    )
+        status=status.HTTP_200_OK)
