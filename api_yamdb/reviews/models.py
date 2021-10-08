@@ -43,3 +43,29 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.text
+
+
+class Genre(models.Model):
+    name = models.CharField('Жанр', max_length=200)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = 'Жанр'
+        verbose_name_plural = 'Жанры'
+
+    def __str__(self):
+        return self.name
+
+
+class Category(models.Model):
+    name = models.CharField('Категория', max_length=200)
+    slug = models.SlugField(max_length=100, unique=True)
+
+    class Meta:
+        ordering = ['-id']
+        verbose_name = 'Категоря'
+        verbose_name_plural = 'Категории'
+
+    def __str__(self):
+        return self.name
