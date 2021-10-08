@@ -1,4 +1,4 @@
-# from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 from reviews.models import Comment, Review, Titles
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
@@ -21,5 +21,3 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Comment
-
-

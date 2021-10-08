@@ -3,8 +3,7 @@ from reviews.models import Comment, Review, Titles
 from rest_framework import filters, mixins, permissions, viewsets
 # from rest_framework.pagination import LimitOffsetPagination
 # from django_filters.rest_framework import DjangoFilterBackend
-#
-# from .permissions import IsAuthorOrReadOnlyPermission
+from .permissions import IsAuthorOrReadOnlyPermission
 from .serializers import (
     ReviewSerializer,
     CommentSerializer,
@@ -24,7 +23,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
 
-    # permission_classes = [IsAuthorOrReadOnlyPermission]
+    permission_classes = [IsAuthorOrReadOnlyPermission]
 
     def get_queryset(self):
         review = get_object_or_404(Review, id=self.kwargs['review_id'])
