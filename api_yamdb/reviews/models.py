@@ -1,11 +1,8 @@
-from django.contrib.auth import get_user_model
 from users.models import User
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
 from .validators import validate_custom_year
-
-# User = get_user_model()
 
 
 class Genre(models.Model):
