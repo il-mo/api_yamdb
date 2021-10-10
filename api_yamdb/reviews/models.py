@@ -68,15 +68,19 @@ class Review(models.Model):
     score = models.PositiveIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(10)]
     )
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
 
     class Meta:
-        ordering = ('-created',)
+        unique_together = (
+            "author",
+            "title",
+        )
+        ordering = ('-pub_date',)
 
     def __str__(self):
-        return self.text
+        return self.title
 
 
 class Comment(models.Model):
@@ -87,7 +91,7 @@ class Comment(models.Model):
         Review, on_delete=models.CASCADE, related_name='comments'
     )
     text = models.TextField()
-    created = models.DateTimeField(
+    pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
 
