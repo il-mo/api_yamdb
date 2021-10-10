@@ -1,7 +1,5 @@
-from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueTogetherValidator
 
 from reviews.models import Category, Comment, Genre, Review, Title
 
@@ -10,23 +8,23 @@ class ReviewSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field='username', read_only=True)
 
     class Meta:
-        fields = '__all__'
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
 
     def validate(self, data):
-        if Review.objects.filter(
-            title=self.context['title_id'], author=self.context['request'].user
-        ).exists():
+        author = self.context.get('request').user
+        title_id = self.context.get('view').kwargs.get('title_id')
+
+        if (
+            self.context.get('request').method == 'POST'
+            and Review.objects.filter(
+                title_id=title_id, author_id=author.id
+            ).exists()
+        ):
             raise serializers.ValidationError(
-                'Вы уже оставляли отзыв на это произведение'
+                'Вы уже оставляли свой отзыв на данное произведение'
             )
         return data
-
-    validators = [
-        UniqueTogetherValidator(
-            queryset=Review.objects.all(), fields=('title', 'author')
-        )
-    ]
 
 
 class CommentSerializer(serializers.ModelSerializer):
