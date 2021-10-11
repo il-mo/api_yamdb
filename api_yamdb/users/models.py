@@ -9,7 +9,7 @@ class User(AbstractUser):
     USER_ROLES = [
         (ADMIN, 'Admin role'),
         (USER, 'User role'),
-        (MODERATOR, 'Moderator role'),]
+        (MODERATOR, 'Moderator role')]
     email = models.EmailField(max_length=254, unique=True)
     role = models.CharField(
         max_length=10,
