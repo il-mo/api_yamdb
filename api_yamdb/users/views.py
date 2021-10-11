@@ -10,14 +10,15 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import User
-from .permissions import IsAdminOrSuperUser
+from .permissions import IsAdmin
 from .serializers import (RegistrationSerializer, TokenSerializer,
                           UserSerializer)
+from django.conf import settings
 
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    permission_classes = (IsAdminOrSuperUser,)
+    permission_classes = (IsAdmin,)
     serializer_class = UserSerializer
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
@@ -66,7 +67,7 @@ def registration_API_view(request):
         send_mail(
             'Token',
             f'{token}',
-            'Cuencaldd@ya.ru',
+            f'{settings.MAILING_EMAIL}',
             [email],
             fail_silently=False,
         )
