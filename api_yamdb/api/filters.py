@@ -5,7 +5,8 @@ from reviews.models import Title
 
 class TitlesFilter(filters.FilterSet):
     name = filters.CharFilter(
-        lookup_expr='contains',
+        field_name='name',
+        lookup_expr='icontains',
     )
     year = filters.NumberFilter(
         field_name='year',
