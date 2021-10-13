@@ -51,7 +51,7 @@ def registration_API_view(request):
     username = serializer.validated_data.get('username')
     email = serializer.validated_data.get('email')
     user, created = User.objects.get_or_create(username=username,
-                                                 email=email)
+                                               email=email)
 
     if not created:
         return Response(
