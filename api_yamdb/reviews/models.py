@@ -4,7 +4,6 @@ from django.db import models
 
 from .validators import validate_custom_year
 
-
 User = get_user_model()
 
 
@@ -52,6 +51,8 @@ class Title(models.Model):
 
     class Meta:
         ordering = ['-id']
+        verbose_name = 'Произведние'
+        verbose_name_plural = 'Произведения'
 
     def __str__(self):
         return self.name
@@ -78,6 +79,8 @@ class Review(models.Model):
             "title",
         )
         ordering = ('-pub_date',)
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
 
     def __str__(self):
         return self.title
@@ -94,6 +97,10 @@ class Comment(models.Model):
     pub_date = models.DateTimeField(
         'Дата добавления', auto_now_add=True, db_index=True
     )
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         return self.text
