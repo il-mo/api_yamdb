@@ -13,7 +13,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         Check that the username is not "me".
         """
         if 'me' == value.lower():
-            raise serializers.ValidationError('''Username cann't be "me"''')
+            raise serializers.ValidationError('Username can not be "me"')
         return value
 
 

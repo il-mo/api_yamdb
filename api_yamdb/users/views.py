@@ -50,17 +50,16 @@ def registration_API_view(request):
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data.get('username')
     email = serializer.validated_data.get('email')
-    users = User.objects.filter(username=username)
-    if users.exists():
+    user, created = User.objects.get_or_create(username=username,
+                                                 email=email)
+
+    if not created:
         return Response(
             data={
                 'error': 'Данный пользователь уже зарегестрирован.',
             },
             status=status.HTTP_400_BAD_REQUEST,
         )
-
-    user = User.objects.create_user(username=username, email=email)
-    user.save()
 
     token = default_token_generator.make_token(user)
     try:
